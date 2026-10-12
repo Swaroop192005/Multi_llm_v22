@@ -291,8 +291,19 @@ def analyze() -> None:
               f"({b[2] * 100:.1f}% toward llama3, p={b[3]:.3g})")
         print(f"  {CANDIDATE_MODEL:<10} identity lean {c[1]:+.4f}  "
               f"({c[2] * 100:.1f}% toward llama3, p={c[3]:.3g})")
-        print(f"  shift: {c[1] - b[1]:+.4f}  "
-              f"({(c[2] - b[2]) * 100:+.1f} pp toward parity)")
+        # Report DISTANCE FROM PARITY, not raw shift. A model can move a long way
+        # and sail past 50/50 - "shifted 30 pp toward parity" would be flatly
+        # misleading if it overshot and landed further from parity than it began.
+        b_dist, c_dist = abs(b[2] - 0.5) * 100, abs(c[2] - 0.5) * 100
+        print(f"  raw shift: {c[1] - b[1]:+.4f} cosine "
+              f"({(c[2] - b[2]) * 100:+.1f} pp)")
+        print(f"  |distance from 50/50 parity|: {BASELINE_MODEL} {b_dist:.1f} pp "
+              f"-> {CANDIDATE_MODEL} {c_dist:.1f} pp "
+              f"({'IMPROVED' if c_dist < b_dist else 'OVERSHOT - worse on identity'})")
+        if (b[2] - 0.5) * (c[2] - 0.5) < 0:
+            print("  NOTE: the lean CHANGED SIGN - the candidate does not merely "
+                  "neutralise the\n        bias, it leans the other way. A new "
+                  "asymmetry, not an absence of one.")
 
 
 def main() -> None:

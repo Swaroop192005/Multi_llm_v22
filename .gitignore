@@ -40,3 +40,5 @@ pdf_build/__pycache__/
 # LFS quota on an artifact that is not a result.
 training/combiner_replay.db
 training/replay_run.log
+tunnel_app.log
+tunnel_*.log
